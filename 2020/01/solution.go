@@ -33,9 +33,9 @@ func part1(input []int) string {
 
 func part2(input []int) string {
 	var res [3]int
-	for _, one := range input {
-		for _, two := range input {
-			for _, three := range input {
+	for i, one := range input {
+		for j, two := range input[i+1:] {
+			for _, three := range input[j+1:] {
 				if one+two+three == 2020 {
 					res[0], res[1], res[2] = one, two, three
 					break
