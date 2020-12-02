@@ -9,12 +9,7 @@ import (
 
 // ReadEntireFile does what it says on the tin
 func ReadEntireFile(name string) string {
-	f, err := os.Open(name)
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-	res, err := ioutil.ReadAll(f)
+	res, err := ioutil.ReadFile(name)
 	if err != nil {
 		panic(err)
 	}
