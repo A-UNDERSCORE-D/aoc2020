@@ -25,9 +25,10 @@ type boardingPass struct {
 	seat   int
 }
 
-const (
-	RowMax  = 128
-	SeatMax = 8
+
+var (
+	rowsGlobal  = makeInts(128)
+	seatsGlobal = makeInts(8)
 )
 
 func makeInts(length int) (out []int) {
@@ -38,8 +39,8 @@ func makeInts(length int) (out []int) {
 }
 
 func (b *boardingPass) resolve() {
-	rows := makeInts(RowMax)
-	seats := makeInts(SeatMax)
+	rows := []int(rowsGlobal)
+	seats := []int(seatsGlobal)
 	for _, chr := range b.source {
 		rowCenter := int(math.Round(float64(len(rows)) / 2))
 		seatCenter := int(math.Round(float64(len(seats)) / 2))
