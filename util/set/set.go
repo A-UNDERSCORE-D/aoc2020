@@ -34,7 +34,7 @@ func (s *Set) Intersect(other *Set) *Set {
 	out := NewSetWithLength(util.Min(s.Length(), other.Length()))
 	for v := range s.internalMap {
 		if other.Contains(v) {
-			out.InsertMany(v)
+			out.Insert(v)
 		}
 	}
 	return out
@@ -51,13 +51,13 @@ func (s *Set) Difference(other *Set) *Set {
 	out := NewSetWithLength(util.Min(s.Length(), other.Length()))
 	for v := range s.internalMap {
 		if !other.Contains(v) {
-			out.InsertMany(v)
+			out.Insert(v)
 		}
 	}
 
 	for v := range other.internalMap {
 		if !s.Contains(v) {
-			out.InsertMany(v)
+			out.Insert(v)
 		}
 	}
 	return out
