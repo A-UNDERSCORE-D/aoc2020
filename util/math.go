@@ -96,3 +96,10 @@ func Lcm(a, b int64, integers ...int64) int64 {
 	}
 	return result
 }
+
+func Sum(ints ...int) (out int) {
+	for _, v := range ints {
+		out += v
+	}
+	return
+}
