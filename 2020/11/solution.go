@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"runtime/pprof"
 	"strconv"
 	"strings"
 	"time"
@@ -24,14 +26,19 @@ L.LLLLL.LL`
 func main() {
 	input := util.ReadLines("input.txt")
 	// input = strings.Split(testData, "\n")
+	// f, _ := os.Create("profile")
+	// pprof.StartCPUProfile(f)
+	// defer pprof.StopCPUProfile()
 
 	startTime := time.Now()
-	res := part1(input)
-	fmt.Println("Part 1:", res, "Took:", time.Since(startTime))
-
-	time.Sleep(time.Second * 5)
+	parsed := parseField(input)
+	fmt.Println("Parsing done. Took: ", time.Since(startTime))
 	startTime = time.Now()
-	res = part2(input)
+	res := part1(parsed)
+	fmt.Println("Part 1:", res, "Took:", time.Since(startTime))
+	
+	startTime = time.Now()
+	res = part2(parsed)
 	fmt.Println("Part 2:", res, "Took:", time.Since(startTime))
 }
 
@@ -50,7 +57,7 @@ type position struct {
 type field map[vector.Vec2d]position
 
 func parseField(fieldStr []string) field {
-	out := make(map[vector.Vec2d]position)
+	out := make(map[vector.Vec2d]position, len(fieldStr)*len(fieldStr[0]))
 
 	for y, row := range fieldStr {
 		for x, seat := range row {
@@ -120,10 +127,8 @@ func (f field) String() string {
 	return lineBuilder.String()
 }
 
-func (f field) nextStatePart1(pos vector.Vec2d) position {
-	emptyAround := 0
+func (f field) nextState(pos vector.Vec2d, part1 bool) position {
 	fullAround := 0
-	floorAround := 0
 	currentSeat, ok := f[pos]
 	if !ok {
 		panic("Bad seat passed")
@@ -134,20 +139,22 @@ func (f field) nextStatePart1(pos vector.Vec2d) position {
 	}
 
 	for _, direction := range vector.V2Directions {
-		other, ok := f[pos.Add(direction)]
+		var other position
+		var ok bool
+		if part1 {
+			other, ok = f[pos.Add(direction)]
+		} else {
+			var otherPos vector.Vec2d
+			otherPos, ok = f.rayCastFindNextSeat(pos, direction)
+			other = f[otherPos]
+		}
+
 		if !ok {
 			continue // Must be at the edges
 		}
 
-		switch other.state {
-		case unknown:
-			fmt.Println("UNKNOWN STATE AT ", pos.Add(direction))
-		case fullSeat:
+		if other.state == fullSeat {
 			fullAround++
-		case emptySeat:
-			emptyAround++
-		case floor:
-			floorAround++
 		}
 	}
 
@@ -155,7 +162,7 @@ func (f field) nextStatePart1(pos vector.Vec2d) position {
 	case currentSeat.state == emptySeat && fullAround == 0:
 		currentSeat.state = fullSeat
 		return currentSeat
-	case currentSeat.state == fullSeat && fullAround >= 4:
+	case currentSeat.state == fullSeat && (part1 && fullAround >= 4) || (!part1 && fullAround >= 5):
 		currentSeat.state = emptySeat
 		return currentSeat
 	}
@@ -172,9 +179,9 @@ func (f field) iter(fn func(position)) {
 }
 
 func (f field) stepPart1() field {
-	out := make(field)
+	out := make(field, len(f))
 
-	f.iter(func(p position) { out[p.Vec2d] = f.nextStatePart1(p.Vec2d) })
+	f.iter(func(p position) { out[p.Vec2d] = f.nextState(p.Vec2d, true) })
 
 	return out
 }
@@ -193,9 +200,8 @@ func (f field) Equals(other field) bool {
 	return true
 }
 
-func part1(input []string) string {
-	parsed := parseField(input)
-	oldField := parsed
+func part1(input field) string {
+	oldField := input
 	var final field
 	for {
 		newField := oldField.stepPart1()
@@ -234,63 +240,14 @@ func (f field) rayCastFindNextSeat(pos vector.Vec2d, direction vector.Vec2d) (ve
 	}
 }
 
-func (f field) nextStatePart2(pos vector.Vec2d) position {
-	emptyAround := 0
-	fullAround := 0
-	floorAround := 0
-	currentSeat, ok := f[pos]
-	if !ok {
-		panic("Bad seat passed")
-	}
-
-	if currentSeat.state == floor {
-		return currentSeat
-	}
-
-	for _, direction := range vector.V2Directions {
-		otherPos, ok := f.rayCastFindNextSeat(pos, direction)
-		if !ok {
-			continue // Must be at the edges
-		}
-
-		other := f[otherPos]
-
-		switch other.state {
-		case unknown:
-			fmt.Println("UNKNOWN STATE AT ", pos.Add(direction))
-		case fullSeat:
-			fullAround++
-		case emptySeat:
-			emptyAround++
-		case floor:
-			floorAround++
-		}
-	}
-
-	switch {
-	case currentSeat.state == emptySeat && fullAround == 0:
-		currentSeat.state = fullSeat
-		return currentSeat
-	case currentSeat.state == fullSeat && fullAround >= 5:
-		currentSeat.state = emptySeat
-		return currentSeat
-	}
-
-	return currentSeat
-}
-
 func (f field) stepPart2() field {
-	out := make(field)
-
-	f.iter(func(p position) {
-		out[p.Vec2d] = f.nextStatePart2(p.Vec2d)
-	})
+	out := make(field, len(f))
+	f.iter(func(p position) { out[p.Vec2d] = f.nextState(p.Vec2d, false) })
 	return out
 }
 
-func part2(input []string) string {
-	parsed := parseField(input)
-	oldField := parsed
+func part2(input field) string {
+	oldField := input
 	var final field
 	for {
 		newField := oldField.stepPart2()
