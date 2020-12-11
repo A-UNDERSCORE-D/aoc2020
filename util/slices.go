@@ -34,3 +34,12 @@ func StringSliceContains(slice []string, value string) bool {
 	}
 	return false
 }
+
+func IntSliceContains(slice []int, value int) bool {
+	for _, v := range slice {
+		if v == value {
+			return true
+		}
+	}
+	return false
+}
