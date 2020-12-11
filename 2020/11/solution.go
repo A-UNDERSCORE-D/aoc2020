@@ -173,12 +173,8 @@ func (f field) iter(fn func(position)) {
 
 func (f field) stepPart1() field {
 	out := make(field)
-	for y := 0; y < f.maxY(); y++ {
-		for x := 0; x < f.maxX(); x++ {
-			targetPos := vector.New2d(x, y)
-			out[targetPos] = f.nextStatePart1(targetPos)
-		}
-	}
+
+	f.iter(func(p position) { out[p.Vec2d] = f.nextStatePart1(p.Vec2d) })
 
 	return out
 }
@@ -207,10 +203,10 @@ func part1(input []string) string {
 			final = newField
 			break
 		}
-		fmt.Print("\033[2J", newField.String())
+		// fmt.Print("\033[2J", newField.String())
 		oldField = newField
 
-		time.Sleep(time.Millisecond * 150)
+		// time.Sleep(time.Millisecond * 150)
 	}
 	seatCount := 0
 	final.iter(func(p position) {
@@ -302,10 +298,10 @@ func part2(input []string) string {
 			final = newField
 			break
 		}
-		fmt.Print("\033[2J", newField.String())
+		// fmt.Print("\033[2J", newField.String())
 		oldField = newField
 
-		time.Sleep(time.Millisecond * 150)
+		// time.Sleep(time.Millisecond * 150)
 	}
 	seatCount := 0
 	final.iter(func(p position) {
