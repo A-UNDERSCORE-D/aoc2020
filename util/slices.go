@@ -43,3 +43,13 @@ func IntSliceContains(slice []int, value int) bool {
 	}
 	return false
 }
+
+func MakeIntSlice(length, step int) []int {
+	num := 0
+	out := make([]int, length)
+	for i := 0; i < length; i++ {
+		out[i] = num
+		num += step
+	}
+	return out
+}
