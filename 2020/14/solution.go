@@ -73,7 +73,8 @@ func maskPermut(mask string) []maskWithFloats {
 	num := strings.Count(mask, "X")
 	var realNum uint64 = 0xFFFFFFFFFFFFFFFF >> (64 - num)
 	printFMask := fmt.Sprintf("%%0%db", num)
-	nextMask := ""
+	nextMask := strings.Builder{}
+	nextMask.Grow(len(mask))
 	for i := 0; uint64(i) <= realNum; i++ {
 		bitCount := 0
 		bits := fmt.Sprintf(printFMask, i)
@@ -81,16 +82,16 @@ func maskPermut(mask string) []maskWithFloats {
 		for i, chr := range mask {
 			switch chr {
 			case 'X':
-				nextMask += string(bits[bitCount])
+				nextMask.WriteByte(bits[bitCount])
 				floats = append(floats, [2]int{35 - i, int(bits[bitCount]) - 48})
 				bitCount++
 			default:
-				nextMask += string(chr)
+				nextMask.WriteRune(chr)
 			}
 		}
 
-		out = append(out, maskWithFloats{mask: nextMask, floats: floats})
-		nextMask = ""
+		out = append(out, maskWithFloats{mask: nextMask.String(), floats: floats})
+		nextMask.Reset()
 	}
 
 	return out
