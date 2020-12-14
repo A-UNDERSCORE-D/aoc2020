@@ -53,7 +53,7 @@ outer:
 			}
 		}
 		// We didnt match
-		return fmt.Sprint("Weird number is: ", input[i]), input[i]
+		return fmt.Sprint(input[i]), input[i]
 	}
 	return "???", -1
 }

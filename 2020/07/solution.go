@@ -38,13 +38,7 @@ type Bag struct {
 
 func (b *Bag) couldContain(name string) bool {
 	for _, bag := range b.canContain {
-		if bag.colour == name {
-			return true
-		}
-	}
-
-	for _, bag := range b.canContain {
-		if bag.couldContain(name) {
+		if bag.colour == name || bag.couldContain(name) {
 			return true
 		}
 	}

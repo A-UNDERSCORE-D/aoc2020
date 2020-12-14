@@ -53,3 +53,13 @@ func MakeIntSlice(length, step int) []int {
 	}
 	return out
 }
+
+func FilterStrSlice(in []string, filterFunc func(string) bool) []string {
+	out := make([]string, 0, len(in))
+	for _, v := range in {
+		if filterFunc(v) {
+			out = append(out, v)
+		}
+	}
+	return out
+}

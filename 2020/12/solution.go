@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"image"
+	"image/color"
+	"image/draw"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -41,14 +45,20 @@ func part1(input []string) string {
 	currentFacing := 'E'
 	currentDirIdx := 1
 
+	moves := [][2]image.Point{}
+
 	for _, ins := range input {
 		insChr := rune(ins[0])
 		num := util.GetInt(ins[1:])
 		switch insChr {
 		case 'F':
+			oldPos := curPos
 			curPos = curPos.Add(dirLut[dirLut2[currentDirIdx]].MulInt(num))
+			moves = append(moves, [2]image.Point{image.Point(oldPos), image.Point(curPos)})
 		case 'N', 'E', 'S', 'W':
+			oldPos := curPos
 			curPos = curPos.Add(dirLut[insChr].MulInt(num))
+			moves = append(moves, [2]image.Point{image.Point(oldPos), image.Point(curPos)})
 		case 'L':
 			// Because I cant math when Im tired, apparently
 			for i := 0; i < num/90; i++ {
@@ -64,8 +74,41 @@ func part1(input []string) string {
 		}
 	}
 
+	minX := math.MaxInt64
+	maxX := math.MinInt64
+	minY := math.MaxInt64
+	maxY := math.MinInt64
+	for _, v := range moves {
+		for _, p := range v {
+			minX = util.Min(minX, p.X)
+			maxX = util.Max(maxX, p.X)
+			minY = util.Min(minY, p.Y)
+			maxY = util.Max(maxY, p.Y)
+		}
+	}
+
+	img := image.NewRGBA(image.Rect(minX-1, minY-1, maxX+1, maxY+1))
+	// one := image.Pt(1, 1)
+	for i, v := range moves {
+		const offset = 1
+		p1 := vector.Vec2d(v[0]).AddInt(offset)
+		p2 := vector.Vec2d(v[1]).AddInt(offset)
+		// if util.Max(p1.X, p2.X) == p2.X {
+		// 	p1 = v[1]
+		// 	p2 = v[0]
+		// }
+
+		rect := image.Rect(
+			util.Min(p1.X, p2.X),
+			util.Min(p1.Y, p2.Y),
+			util.Max(p1.X, p2.X)+1,
+			util.Max(p1.Y, p2.Y)+1,
+		)
+		draw.Draw(img, rect, &image.Uniform{color.NRGBA64{R:  math.MaxUint16, A: math.MaxUint16, G: uint16(i)*1000, B:  uint16(i)*100}}, image.Point{}, draw.Src)
+	}
+	// draw.Draw(img, image.Rectangle{image.Point(oldPos.SubInt(1)), image.Point(curPos.AddInt(1))}, &image.Uniform{color.White}, image.Point{}, draw.Src)
 	_ = currentFacing
-	fmt.Println(curPos)
+	util.PNGQuick("./test.png", img)
 	return strconv.FormatInt(int64(util.Abs(curPos.X)+util.Abs(curPos.Y)), 10)
 }
 

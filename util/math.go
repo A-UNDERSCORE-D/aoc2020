@@ -103,3 +103,45 @@ func Sum(ints ...int) (out int) {
 	}
 	return
 }
+
+func Product(ints ...int) (out int) {
+	if len(ints) < 2 {
+		return -1
+	}
+	out = 1
+	for _, v := range ints {
+		out *= v
+	}
+	return
+}
+
+// InverseMod is an implementation of the Extended Euclidean Algo as shown by
+// The wiki page of the same name. This one drops some uneeded calculations
+// and returns the modular multiplicitive inverse of the given numbers
+func InverseMod(a, n int) int {
+	t, newT, r, newR := 0, 1, n, a
+
+	for newR != 0 {
+		quotient := r / newR
+		t, newT = newT, t-quotient*newT
+		r, newR = newR, r-quotient*newR
+	}
+
+	if r > 1 {
+		return -1
+	}
+	if t < 0 {
+		t = t + n
+	}
+
+	return t
+}
+
+func Inv2(m, n int) int {
+	for i := 1; i <= n; i++ {
+		if ((m * i) % n) == 1 {
+			return i
+		}
+	}
+	panic("asd")
+}

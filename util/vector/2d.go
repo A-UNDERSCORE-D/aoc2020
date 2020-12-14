@@ -29,10 +29,24 @@ func (p Vec2d) Add(other Vec2d) Vec2d {
 	}
 }
 
+func (p Vec2d) AddInt(i int) Vec2d {
+	return Vec2d{
+		X: p.X + i,
+		Y: p.Y + i,
+	}
+}
+
 func (p Vec2d) Sub(other Vec2d) Vec2d {
 	return Vec2d{
 		X: p.X - other.X,
 		Y: p.Y - other.Y,
+	}
+}
+
+func (p Vec2d) SubInt(i int) Vec2d {
+	return Vec2d{
+		X: p.X - i,
+		Y: p.Y - i,
 	}
 }
 

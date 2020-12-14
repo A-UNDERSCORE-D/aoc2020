@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"runtime/pprof"
+	"image"
+	"image/color"
+	"image/color/palette"
 	"strconv"
 	"strings"
 	"time"
 
 	"awesome-dragon.science/go/adventofcode2020/util"
+	"awesome-dragon.science/go/adventofcode2020/util/draw"
 	"awesome-dragon.science/go/adventofcode2020/util/vector"
 )
 
@@ -36,7 +38,7 @@ func main() {
 	startTime = time.Now()
 	res := part1(parsed)
 	fmt.Println("Part 1:", res, "Took:", time.Since(startTime))
-	
+
 	startTime = time.Now()
 	res = part2(parsed)
 	fmt.Println("Part 2:", res, "Took:", time.Since(startTime))
@@ -47,6 +49,11 @@ const (
 	emptySeat
 	fullSeat
 	floor
+)
+
+const (
+	dotSize  = 10
+	dotSpace = 2
 )
 
 type position struct {
@@ -76,6 +83,24 @@ func parseField(fieldStr []string) field {
 		}
 	}
 	return out
+}
+
+func (f field) toImage(dotSize, spacing int) image.Image {
+	dots := []draw.Dot{}
+	f.iter(func(p position) {
+		var dot draw.Dot
+		switch p.state {
+		case floor:
+			dot = &draw.SquareDot{Colour: color.White, Position: image.Point(p.Vec2d)}
+		case emptySeat:
+			dot = &draw.SquareDot{Colour: color.RGBA{B: 0xFF, A: 0xFF}, Position: image.Point(p.Vec2d)}
+		case fullSeat:
+			dot = &draw.SquareDot{Colour: color.RGBA{R: 0xFF, A: 0xFF}, Position: image.Point(p.Vec2d)}
+		}
+		dots = append(dots, dot)
+	})
+
+	return draw.RenderDots(f.maxX(), f.maxY(), palette.Plan9, dots, dotSize, spacing)
 }
 
 var maxX = -1
@@ -201,7 +226,9 @@ func (f field) Equals(other field) bool {
 }
 
 func part1(input field) string {
+	// var images []image.Image
 	oldField := input
+	// images = append(images, oldField.toImage(dotSize, dotSpace))
 	var final field
 	for {
 		newField := oldField.stepPart1()
@@ -209,6 +236,7 @@ func part1(input field) string {
 			final = newField
 			break
 		}
+		// images = append(images, newField.toImage(dotSize, dotSpace))
 		// fmt.Print("\033[2J", newField.String())
 		oldField = newField
 
@@ -221,6 +249,17 @@ func part1(input field) string {
 		}
 	})
 
+	// finalImg := final.toImage(dotSize, dotSpace)
+	// images = append(images, finalImg)
+
+	// os.Mkdir("./p1", 0o744)
+	// for i, v := range images {
+	// 	f, _ := os.Create(fmt.Sprintf("./p1/%d.png", i))
+	// 	if err := png.Encode(f, v); err != nil {
+	// 		panic(err)
+	// 	}
+	// 	f.Close()
+	// }
 	return strconv.FormatInt(int64(seatCount), 10)
 }
 
@@ -247,7 +286,9 @@ func (f field) stepPart2() field {
 }
 
 func part2(input field) string {
+	// var images []*image.Paletted
 	oldField := input
+	// images = append(images, oldField.toImage(dotSize, dotSpace).(*image.Paletted))
 	var final field
 	for {
 		newField := oldField.stepPart2()
@@ -255,6 +296,7 @@ func part2(input field) string {
 			final = newField
 			break
 		}
+		// images = append(images, newField.toImage(dotSize, dotSpace).(*image.Paletted))
 		// fmt.Print("\033[2J", newField.String())
 		oldField = newField
 
@@ -266,6 +308,15 @@ func part2(input field) string {
 			seatCount++
 		}
 	})
-
+	// finalImg := final.toImage(dotSize, dotSpace).(*image.Paletted)
+	// images = append(images, finalImg)
+	// os.Mkdir("./p2", 0o744)
+	// for i, v := range images {
+	// 	f, _ := os.Create(fmt.Sprintf("./p2/%d.png", i))
+	// 	if err := png.Encode(f, v); err != nil {
+	// 		panic(err)
+	// 	}
+	// 	f.Close()
+	// }
 	return strconv.FormatInt(int64(seatCount), 10)
 }
