@@ -22,65 +22,47 @@ func main() {
 	fmt.Println("Part 2:", res, "Took:", time.Since(startTime))
 }
 
-func part1(input []int) string {
-	lastNumberSpoken := 0
-	lastSpokenMap := make(map[int][]int)
-
-	for i := 1; i <= 2020; i++ {
-		if i <= len(input) {
-			// First turns add the original numbers
-			lastNumberSpoken = input[i-1]
-			lastSpokenMap[input[i-1]] = append(lastSpokenMap[input[i-1]], i)
-			continue
-		}
-
-		var toSpeak int
-
-		if res, ok := lastSpokenMap[lastNumberSpoken]; ok && len(res) > 1 {
-			// This has been spoken before, when?
-			previousTime := res[len(res)-1]
-			prePreviousTime := res[len(res)-2]
-			toSpeak = previousTime - prePreviousTime
-		} else {
-			// Not been spoken before, or only spoken once
-			toSpeak = 0
-		}
-
-		lastNumberSpoken = toSpeak
-		lastSpokenMap[toSpeak] = append(lastSpokenMap[toSpeak], i)
-	}
-
-	return strconv.FormatInt(int64(lastNumberSpoken), 10)
-}
-
-func part2(input []int) string {
+func playGame(input []int, iterations int64) int {
 	LastNumberSpoken := 0
-	lastSpokenMap := make(map[int][]int)
+	lastSpokenMap := make(map[int]int, iterations/10)
 
-	for i := 1; i <= 30000000; i++ {
+	prevNum := -1
+
+	for i := 1; int64(i) <= iterations; i++ {
 		if i <= len(input) {
 			// First turns add the original numbers
-			// numberSpoken = append(numberSpoken, input[i-1])
 			LastNumberSpoken = input[i-1]
-			lastSpokenMap[input[i-1]] = append(lastSpokenMap[input[i-1]], i)
+			lastSpokenMap[LastNumberSpoken] = i
 			continue
 		}
 
 		var toSpeak int
 
-		if res, ok := lastSpokenMap[LastNumberSpoken]; ok && len(res) > 1 {
+		if res, ok := lastSpokenMap[LastNumberSpoken]; ok {
 			// This has been spoken before, when?
-			previousTime := res[len(res)-1]
-			prePreviousTime := res[len(res)-2]
+			previousTime := i - 1
+			prePreviousTime := res
 			toSpeak = previousTime - prePreviousTime
 		} else {
 			// Not been spoken before, or only spoken once
 			toSpeak = 0
+		}
+
+		if prevNum != -1 {
+			// set the number we saw last loop, now that we've worked on it already
+			lastSpokenMap[prevNum] = i - 1
 		}
 
 		LastNumberSpoken = toSpeak
-		lastSpokenMap[toSpeak] = append(lastSpokenMap[toSpeak], i)
+		prevNum = toSpeak
 	}
+	return LastNumberSpoken
+}
 
-	return strconv.FormatInt(int64(LastNumberSpoken), 10)
+func part1(input []int) string {
+	return strconv.FormatInt(int64(playGame(input, 2020)), 10)
+}
+
+func part2(input []int) string {
+	return strconv.FormatInt(int64(playGame(input, 3e7)), 10)
 }
