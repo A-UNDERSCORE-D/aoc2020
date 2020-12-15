@@ -23,21 +23,20 @@ func main() {
 }
 
 func part1(input []int) string {
-	numberSpoken := make([]int, 0, 2050)
+	lastNumberSpoken := 0
 	lastSpokenMap := make(map[int][]int)
 
 	for i := 1; i <= 2020; i++ {
 		if i <= len(input) {
 			// First turns add the original numbers
-			numberSpoken = append(numberSpoken, input[i-1])
+			lastNumberSpoken = input[i-1]
 			lastSpokenMap[input[i-1]] = append(lastSpokenMap[input[i-1]], i)
 			continue
 		}
 
 		var toSpeak int
 
-		lastSpoken := numberSpoken[len(numberSpoken)-1]
-		if res, ok := lastSpokenMap[lastSpoken]; ok && len(res) > 1 {
+		if res, ok := lastSpokenMap[lastNumberSpoken]; ok && len(res) > 1 {
 			// This has been spoken before, when?
 			previousTime := res[len(res)-1]
 			prePreviousTime := res[len(res)-2]
@@ -47,29 +46,29 @@ func part1(input []int) string {
 			toSpeak = 0
 		}
 
-		numberSpoken = append(numberSpoken, toSpeak)
+		lastNumberSpoken = toSpeak
 		lastSpokenMap[toSpeak] = append(lastSpokenMap[toSpeak], i)
 	}
 
-	return strconv.FormatInt(int64(numberSpoken[len(numberSpoken)-1]), 10)
+	return strconv.FormatInt(int64(lastNumberSpoken), 10)
 }
 
 func part2(input []int) string {
-	numberSpoken := make([]int, 0, 30000005)
+	LastNumberSpoken := 0
 	lastSpokenMap := make(map[int][]int)
 
 	for i := 1; i <= 30000000; i++ {
 		if i <= len(input) {
 			// First turns add the original numbers
-			numberSpoken = append(numberSpoken, input[i-1])
+			// numberSpoken = append(numberSpoken, input[i-1])
+			LastNumberSpoken = input[i-1]
 			lastSpokenMap[input[i-1]] = append(lastSpokenMap[input[i-1]], i)
 			continue
 		}
 
 		var toSpeak int
 
-		lastSpoken := numberSpoken[len(numberSpoken)-1]
-		if res, ok := lastSpokenMap[lastSpoken]; ok && len(res) > 1 {
+		if res, ok := lastSpokenMap[LastNumberSpoken]; ok && len(res) > 1 {
 			// This has been spoken before, when?
 			previousTime := res[len(res)-1]
 			prePreviousTime := res[len(res)-2]
@@ -79,9 +78,9 @@ func part2(input []int) string {
 			toSpeak = 0
 		}
 
-		numberSpoken = append(numberSpoken, toSpeak)
+		LastNumberSpoken = toSpeak
 		lastSpokenMap[toSpeak] = append(lastSpokenMap[toSpeak], i)
 	}
 
-	return strconv.FormatInt(int64(numberSpoken[len(numberSpoken)-1]), 10)
+	return strconv.FormatInt(int64(LastNumberSpoken), 10)
 }
