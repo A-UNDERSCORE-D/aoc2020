@@ -115,7 +115,7 @@ func (r *Rule) resolve(rules map[string]*Rule, part2 bool) string {
 		return r.contentRaw
 	}
 	out := strings.Builder{}
-	out.WriteString("(")
+	out.WriteString("(?:")
 	// We're more complex than a straight literal
 	// Appears that we only ever get one OR, so split on that, then resolve down
 	split := strings.Split(r.contentRaw, " | ")
@@ -175,20 +175,6 @@ func part1(input []string) string {
 	return fmt.Sprint(matchCount)
 }
 
-var shouldMatch = strings.Split(`
-bbabbbbaabaabba
-babbbbaabbbbbabbbbbbaabaaabaaa
-aaabbbbbbaaaabaababaabababbabaaabbababababaaa
-bbbbbbbaaaabbbbaaabbabaaa
-bbbababbbbaaaaaaaabbababaaababaabab
-ababaaaaaabaaab
-ababaaaaabbbaba
-baabbaaaabbaaaababbaababb
-abbbbabbbbaaaababbbbbbaaaababb
-aaaaabbaabaaaaababaa
-aaaabbaabbaaaaaaabbbabbbaaabbaabaaa
-aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba`, "\n")
-
 func part2(input []string) string {
 	split := strings.Split(input[0], "\n")
 
@@ -209,16 +195,4 @@ func part2(input []string) string {
 	}
 
 	return fmt.Sprint(matchCount)
-}
-
-func pairsMatch(pairs []string) bool {
-	if len(pairs)%2 != 0 {
-		panic("NonEven")
-	}
-	for i := 0; i < len(pairs)-2; i++ {
-		if len(pairs[i]) != len(pairs[i+1]) {
-			return false
-		}
-	}
-	return true
 }
