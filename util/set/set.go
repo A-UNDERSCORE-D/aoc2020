@@ -30,6 +30,10 @@ func (s *Set) InsertMany(vs ...interface{}) {
 	}
 }
 
+func (s *Set) Remove(value interface{}) {
+	delete(s.internalMap, value)
+}
+
 func (s *Set) Intersect(other *Set) *Set {
 	out := NewSetWithLength(util.Min(s.Length(), other.Length()))
 	for v := range s.internalMap {
