@@ -126,16 +126,17 @@ func part1(input []int) string {
 
 func part2(input []int) string {
 	cupsHead := ring.New(1000000)
-	numsLut := make(map[int]*ring.Ring)
+	numsLut2 := make([]*ring.Ring, 1000000)
 	for _, v := range input {
 		cupsHead.Value = v
-		numsLut[v] = cupsHead
+		numsLut2[v-1] = cupsHead
 		cupsHead = cupsHead.Next()
 	}
-
+	maxNum := 0
 	for i := ringMax(cupsHead) + 1; i <= 1000000; i++ {
 		cupsHead.Value = i
-		numsLut[i] = cupsHead
+		numsLut2[i-1] = cupsHead
+		maxNum = i
 		cupsHead = cupsHead.Next()
 	}
 	origHead := cupsHead
@@ -151,19 +152,16 @@ func part2(input []int) string {
 		for ringContains(picked, dst) {
 			dst--
 			if dst == 0 {
-				dst = ringMax(cupsHead)
+				dst = maxNum
 			}
 		}
 
-		dstRing, ok := numsLut[dst]
-		if !ok {
-			panic("Unknown number@")
-		}
+		dstRing := numsLut2[dst-1]
 		dstRing.Link(picked)
 		cupsHead = cupsHead.Next()
 	}
 
-	one := numsLut[1]
+	one := numsLut2[0]
 	a := one.Next()
 	b := a.Next()
 
