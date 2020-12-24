@@ -179,8 +179,8 @@ func fieldExtents(field map[complex64]*Tile) (int, int, int, int) {
 
 func part2(field map[complex64]*Tile) string {
 	maxX, maxY, minX, minY := fieldExtents(field)
+	changes := []complex64{}
 	for i := 0; i < 100; i++ {
-		changes := []complex64{}
 		for y := minY - 1; y < maxY+2; y++ {
 			for x := minX - 1; x < maxX+2; x++ {
 				coord := complex64(complex(float64(x), float64(y)))
@@ -206,7 +206,6 @@ func part2(field map[complex64]*Tile) string {
 
 			}
 		}
-
 		for _, c := range changes {
 			target, exists := field[c]
 			if !exists {
@@ -216,6 +215,8 @@ func part2(field map[complex64]*Tile) string {
 
 			target.Black = !target.Black
 		}
+
+		changes = changes[:0]
 
 		maxX += 1
 		maxY += 1
